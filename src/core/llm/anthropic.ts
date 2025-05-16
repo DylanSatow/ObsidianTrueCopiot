@@ -28,11 +28,12 @@ import {
 import { LLMProvider } from '../../types/provider.types'
 import { parseImageDataUrl } from '../../utils/llm/image'
 
-import { BaseLLMProvider } from './base'
+import { BaseLLMProvider, CompletionRequest, CompletionResponse } from './base'
 import {
   LLMAPIKeyInvalidException,
   LLMAPIKeyNotSetException,
 } from './exception'
+import { defaultGenerateCompletion } from './completion'
 
 export class AnthropicProvider extends BaseLLMProvider<
   Extract<LLMProvider, { type: 'anthropic' }>
@@ -607,5 +608,32 @@ https://github.com/glowingjade/obsidian-smart-composer/issues/286`,
     throw new Error(
       `Provider ${this.provider.id} does not support embeddings. Please use a different provider.`,
     )
+  }
+  
+  async generateCompletion(
+    request: CompletionRequest,
+  ): Promise<CompletionResponse> {
+    if (request.model.providerType !== 'anthropic') {
+      throw new Error('Model is not an Anthropic model')
+    }
+    
+    return defaultGenerateCompletion(request, async (messages: RequestMessage[]) => {
+      // Create a request with parameters that are supported by LLMRequestNonStreaming
+      const llmRequest: LLMRequestNonStreaming = {
+        messages,
+        model: request.model.model,
+        temperature: request.temperature,
+        max_tokens: request.maxTokens,
+      };
+      
+      const response = await this.generateResponse(
+        request.model,
+        llmRequest,
+        { signal: request.signal }
+      );
+      
+      const content = response.choices[0].message.content || '';
+      return { content };
+    });
   }
 }

@@ -10,6 +10,19 @@ import {
 } from '../../types/llm/response'
 import { LLMProvider } from '../../types/provider.types'
 
+export interface CompletionRequest {
+  model: ChatModel
+  prompt: string
+  maxTokens?: number
+  temperature?: number
+  stopSequences?: string[]
+  signal?: AbortSignal
+}
+
+export interface CompletionResponse {
+  completion: string
+}
+
 // TODO: do these really have to be class? why not just function?
 export abstract class BaseLLMProvider<P extends LLMProvider> {
   protected readonly provider: P
@@ -30,4 +43,8 @@ export abstract class BaseLLMProvider<P extends LLMProvider> {
   ): Promise<AsyncIterable<LLMResponseStreaming>>
 
   abstract getEmbedding(model: string, text: string): Promise<number[]>
+  
+  abstract generateCompletion(
+    request: CompletionRequest,
+  ): Promise<CompletionResponse>
 }

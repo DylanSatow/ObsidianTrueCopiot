@@ -16,6 +16,10 @@ import { OpenAIAuthenticatedProvider } from './openai'
 import { OpenAICompatibleProvider } from './openaiCompatibleProvider'
 import { OpenRouterProvider } from './openRouterProvider'
 import { PerplexityProvider } from './perplexityProvider'
+import { initializeProviders } from './utils'
+
+// Initialize all providers with generateCompletion method
+initializeProviders();
 
 /*
  * OpenAI, OpenAI-compatible, and Anthropic providers include token usage statistics

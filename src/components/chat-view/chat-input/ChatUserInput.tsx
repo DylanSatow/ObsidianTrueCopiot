@@ -11,6 +11,7 @@ import {
 } from 'react'
 
 import { useApp } from '../../../contexts/app-context'
+import { useSettings } from '../../../contexts/settings-context'
 import {
   Mentionable,
   MentionableImage,
@@ -65,6 +66,7 @@ const ChatUserInput = forwardRef<ChatUserInputRef, ChatUserInputProps>(
     ref,
   ) => {
     const app = useApp()
+    const { settings } = useSettings()
 
     const editorRef = useRef<LexicalEditor | null>(null)
     const contentEditableRef = useRef<HTMLDivElement>(null)

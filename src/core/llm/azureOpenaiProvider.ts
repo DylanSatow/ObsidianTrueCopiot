@@ -5,6 +5,7 @@ import {
   LLMOptions,
   LLMRequestNonStreaming,
   LLMRequestStreaming,
+  RequestMessage,
 } from '../../types/llm/request'
 import {
   LLMResponseNonStreaming,
@@ -12,7 +13,8 @@ import {
 } from '../../types/llm/response'
 import { LLMProvider } from '../../types/provider.types'
 
-import { BaseLLMProvider } from './base'
+import { BaseLLMProvider, CompletionRequest, CompletionResponse } from './base'
+import { defaultGenerateCompletion } from './completion'
 import { OpenAIMessageAdapter } from './openaiMessageAdapter'
 
 export class AzureOpenAIProvider extends BaseLLMProvider<
@@ -55,6 +57,33 @@ export class AzureOpenAIProvider extends BaseLLMProvider<
     }
 
     return this.adapter.streamResponse(this.client, request, options)
+  }
+
+  async generateCompletion(
+    request: CompletionRequest,
+  ): Promise<CompletionResponse> {
+    if (request.model.providerType !== 'azure-openai') {
+      throw new Error('Model is not an Azure OpenAI model')
+    }
+    
+    return defaultGenerateCompletion(request, async (messages: RequestMessage[]) => {
+      // Create a request with parameters that are supported by the LLMRequestNonStreaming type
+      const llmRequest: LLMRequestNonStreaming = {
+        messages,
+        model: request.model.model,
+        temperature: request.temperature,
+        max_tokens: request.maxTokens,
+      };
+      
+      const response = await this.generateResponse(
+        request.model,
+        llmRequest,
+        { signal: request.signal }
+      );
+      
+      const content = response.choices[0].message.content || '';
+      return { content };
+    });
   }
 
   async getEmbedding(_model: string, _text: string): Promise<number[]> {

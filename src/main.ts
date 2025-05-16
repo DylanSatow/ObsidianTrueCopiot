@@ -7,6 +7,7 @@ import { InstallerUpdateRequiredModal } from './components/modals/InstallerUpdat
 import { APPLY_VIEW_TYPE, CHAT_VIEW_TYPE } from './constants'
 import { McpManager } from './core/mcp/mcpManager'
 import { RAGEngine } from './core/rag/ragEngine'
+import { setupEditorAutocomplete } from './editor-plugins/autocomplete/ObsidianEditorExtension'
 import { DatabaseManager } from './database/DatabaseManager'
 import { PGLiteAbortedException } from './database/exception'
 import { migrateToJsonDatabase } from './database/json/migrateToJsonDatabase'
@@ -18,6 +19,16 @@ import { parseSmartComposerSettings } from './settings/schema/settings'
 import { SmartComposerSettingTab } from './settings/SettingTab'
 import { getMentionableBlockData } from './utils/obsidian'
 
+/**
+ * TODO: Autocomplete Feature for Main Editor
+ * 
+ * In the future, implement cursor-style autocomplete for the main Obsidian editor:
+ * - See implementation files in src/editor-plugins/autocomplete/
+ * - Will require creating a CodeMirror extension to hook into the editor
+ * - Should show real-time completion suggestions as user types
+ * - Can reuse existing LLM provider code for generating completions
+ */
+
 export default class SmartComposerPlugin extends Plugin {
   settings: SmartComposerSettings
   initialChatProps?: ChatProps // TODO: change this to use view state like ApplyView
@@ -28,6 +39,7 @@ export default class SmartComposerPlugin extends Plugin {
   private dbManagerInitPromise: Promise<DatabaseManager> | null = null
   private ragEngineInitPromise: Promise<RAGEngine> | null = null
   private timeoutIds: ReturnType<typeof setTimeout>[] = [] // Use ReturnType instead of number
+  private editorAutocompleteCleanup: (() => void) | null = null
 
   async onload() {
     await this.loadSettings()
@@ -39,6 +51,11 @@ export default class SmartComposerPlugin extends Plugin {
     this.addRibbonIcon('wand-sparkles', 'Open smart composer', () =>
       this.openChatView(),
     )
+
+    // Set up editor autocomplete if enabled
+    if (this.settings.editorAutocomplete.enabled) {
+      this.setupEditorAutocomplete()
+    }
 
     // This adds a simple command that can be triggered anywhere
     this.addCommand({
@@ -92,6 +109,68 @@ export default class SmartComposerPlugin extends Plugin {
         // Execute the reject changes action
         applyView.rejectChanges();
         return true;
+      },
+      hotkeys: [
+        {
+          modifiers: [],
+          key: "Escape",
+        },
+      ],
+    });
+
+    // Command to accept current autocomplete suggestion
+    this.addCommand({
+      id: 'accept-autocomplete',
+      name: 'Accept current autocomplete suggestion',
+      editorCallback: () => {
+        // Find the ghost element
+        const ghostElement = document.querySelector('.smtcmp-autocomplete-ghost-text') as HTMLElement | null;
+        if (!ghostElement || ghostElement.style.display === 'none') return;
+        
+        // Get the suggestion text
+        const ghostText = ghostElement.querySelector('.smtcmp-autocomplete-ghost-cursor')?.textContent;
+        if (!ghostText) return;
+        
+        // Get the active editor
+        const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+        if (!activeView) return;
+        
+        const editor = activeView.editor;
+        if (!editor) return;
+        
+        // Insert the suggestion at cursor position
+        const cursor = editor.getCursor();
+        editor.replaceRange(ghostText, cursor, cursor);
+        
+        // Move cursor to end of inserted text
+        const newCursorPos = {
+          line: cursor.line,
+          ch: cursor.ch + ghostText.length
+        };
+        editor.setCursor(newCursorPos);
+        
+        // Hide the ghost element
+        ghostElement.style.display = 'none';
+      },
+      hotkeys: [
+        {
+          modifiers: [],
+          key: "Tab",
+        },
+      ],
+    });
+
+    // Command to dismiss current autocomplete suggestion
+    this.addCommand({
+      id: 'dismiss-autocomplete',
+      name: 'Dismiss current autocomplete suggestion',
+      editorCallback: () => {
+        // Find the ghost element
+        const ghostElement = document.querySelector('.smtcmp-autocomplete-ghost-text') as HTMLElement | null;
+        if (!ghostElement || ghostElement.style.display === 'none') return;
+        
+        // Hide the ghost element
+        ghostElement.style.display = 'none';
       },
       hotkeys: [
         {
@@ -178,6 +257,12 @@ export default class SmartComposerPlugin extends Plugin {
   }
 
   onunload() {
+    // Clean up editor autocomplete
+    if (this.editorAutocompleteCleanup) {
+      this.editorAutocompleteCleanup()
+      this.editorAutocompleteCleanup = null
+    }
+    
     // clear all timers
     this.timeoutIds.forEach((id) => clearTimeout(id))
     this.timeoutIds = []
@@ -213,10 +298,41 @@ ${validationResult.error.issues.map((v) => v.message).join('\n')}`)
       return
     }
 
+    // Check if editor autocomplete was enabled/disabled
+    const wasAutocompleteEnabled = this.settings.editorAutocomplete.enabled
+    const isAutocompleteEnabled = newSettings.editorAutocomplete.enabled
+
     this.settings = newSettings
     await this.saveData(newSettings)
     this.ragEngine?.setSettings(newSettings)
     this.settingsChangeListeners.forEach((listener) => listener(newSettings))
+
+    // Handle autocomplete setting changes
+    if (wasAutocompleteEnabled !== isAutocompleteEnabled) {
+      if (isAutocompleteEnabled) {
+        this.setupEditorAutocomplete()
+      } else if (this.editorAutocompleteCleanup) {
+        this.editorAutocompleteCleanup()
+        this.editorAutocompleteCleanup = null
+      }
+    }
+  }
+
+  // Set up editor autocomplete
+  private setupEditorAutocomplete() {
+    // Clean up any existing autocomplete
+    if (this.editorAutocompleteCleanup) {
+      this.editorAutocompleteCleanup()
+      this.editorAutocompleteCleanup = null
+    }
+    
+    try {
+      this.editorAutocompleteCleanup = setupEditorAutocomplete(this, this.settings)
+      console.log('Editor autocomplete enabled')
+    } catch (error) {
+      console.error('Failed to setup editor autocomplete:', error)
+      new Notice('Failed to set up editor autocomplete. Please check the console for details.')
+    }
   }
 
   addSettingsChangeListener(

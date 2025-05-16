@@ -13,7 +13,7 @@ import {
 } from '../../types/llm/response'
 import { LLMProvider } from '../../types/provider.types'
 
-import { BaseLLMProvider } from './base'
+import { BaseLLMProvider, CompletionRequest, CompletionResponse } from './base'
 import {
   LLMAPIKeyInvalidException,
   LLMAPIKeyNotSetException,
@@ -123,6 +123,55 @@ export class OpenAIAuthenticatedProvider extends BaseLLMProvider<
       )
     } catch (error) {
       console.error('Error in streamResponse:', error)
+      if (error instanceof OpenAI.AuthenticationError) {
+        throw new LLMAPIKeyInvalidException(
+          'OpenAI API key is invalid. Please update it in settings menu.',
+          error,
+        )
+      }
+      throw error
+    }
+  }
+
+  async generateCompletion(
+    request: CompletionRequest,
+  ): Promise<CompletionResponse> {
+    if (request.model.providerType !== 'openai') {
+      throw new Error('Model is not an OpenAI model')
+    }
+
+    if (!this.client.apiKey) {
+      throw new LLMAPIKeyNotSetException(
+        `Provider ${this.provider.id} API key is missing. Please set it in settings menu.`,
+      )
+    }
+
+    try {
+      const response = await this.client.chat.completions.create({
+        model: request.model.model,
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant that completes the user\'s text. Provide short, accurate continuations.' },
+          { role: 'user', content: request.prompt }
+        ],
+        max_tokens: request.maxTokens || 50,
+        temperature: request.temperature || 0.2,
+        stop: request.stopSequences,
+        stream: false,
+        reasoning_effort: request.model.reasoning_effort as ReasoningEffort,
+      }, {
+        signal: request.signal
+      })
+
+      // Ensure the completion has content
+      if (!response.choices[0]?.message?.content) {
+        throw new Error('No completion content available')
+      }
+
+      return {
+        completion: response.choices[0].message.content
+      }
+    } catch (error) {
+      console.error('Error in generateCompletion:', error)
       if (error instanceof OpenAI.AuthenticationError) {
         throw new LLMAPIKeyInvalidException(
           'OpenAI API key is invalid. Please update it in settings menu.',

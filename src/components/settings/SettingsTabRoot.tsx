@@ -5,6 +5,7 @@ import { ObsidianButton } from '../common/ObsidianButton'
 import { ObsidianSetting } from '../common/ObsidianSetting'
 
 import { ChatSection } from './sections/ChatSection'
+import { EditorAutocompleteSection } from './sections/EditorAutocompleteSection'
 import { EtcSection } from './sections/EtcSection'
 import { McpSection } from './sections/McpSection'
 import { ModelsSection } from './sections/ModelsSection'
@@ -34,6 +35,7 @@ export function SettingsTabRoot({ app, plugin }: SettingsTabRootProps) {
         />
       </ObsidianSetting>
       <ChatSection />
+      <EditorAutocompleteSection />
       <ProvidersSection app={app} plugin={plugin} />
       <ModelsSection app={app} plugin={plugin} />
       <RAGSection app={app} plugin={plugin} />

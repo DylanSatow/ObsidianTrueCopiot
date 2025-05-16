@@ -3,13 +3,18 @@ import {
   InitialEditorStateType,
   LexicalComposer,
 } from '@lexical/react/LexicalComposer'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { EditorRefPlugin } from '@lexical/react/LexicalEditorRefPlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import { LexicalEditor, SerializedEditorState } from 'lexical'
+import { 
+  COMMAND_PRIORITY_LOW, 
+  LexicalEditor, 
+  SerializedEditorState 
+} from 'lexical'
 import { RefObject, useCallback, useEffect } from 'react'
 
 import { useApp } from '../../../contexts/app-context'

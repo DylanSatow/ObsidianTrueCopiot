@@ -80,6 +80,23 @@ export const smartComposerSettingsSchema = z.object({
       enableTools: true,
       maxAutoIterations: 1,
     }),
+    
+  // Editor Autocomplete options
+  editorAutocomplete: z
+    .object({
+      enabled: z.boolean(),
+      minChars: z.number(),
+      debounceMs: z.number(),
+      maxTokens: z.number(),
+      temperature: z.number(),
+    })
+    .catch({
+      enabled: true,
+      minChars: 5,
+      debounceMs: 300,
+      maxTokens: 50,
+      temperature: 0.2,
+    }),
 })
 export type SmartComposerSettings = z.infer<typeof smartComposerSettingsSchema>
 
