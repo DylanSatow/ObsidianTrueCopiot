@@ -1,5 +1,5 @@
 import { CheckIcon, ChevronDown, ChevronUp, X } from 'lucide-react'
-import { getIcon } from 'obsidian'
+import { Platform, getIcon } from 'obsidian'
 import {
   forwardRef,
   useCallback,
@@ -16,9 +16,13 @@ import { DiffBlock, createDiffBlocks } from '../../utils/chat/diff'
 export default function ApplyViewRoot({
   state,
   close,
+  acceptChanges,
+  rejectChanges,
 }: {
   state: ApplyViewState
   close: () => void
+  acceptChanges?: () => void
+  rejectChanges?: () => void
 }) {
   const acceptIcon = getIcon('check')
   const rejectIcon = getIcon('x')
@@ -73,12 +77,21 @@ export default function ApplyViewRoot({
         }
       })
       .join('\n')
-    await app.vault.modify(state.file, newContent)
-    close()
+    
+    if (acceptChanges) {
+      acceptChanges();
+    } else {
+      await app.vault.modify(state.file, newContent)
+      close()
+    }
   }
 
   const handleReject = async () => {
-    close()
+    if (rejectChanges) {
+      rejectChanges();
+    } else {
+      close()
+    }
   }
 
   const acceptCurrentBlock = (index: number) => {
@@ -206,6 +219,30 @@ export default function ApplyViewRoot({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Add keyboard shortcut listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Cmd/Ctrl+Enter based on platform
+      if (e.key === 'Enter' && (Platform.isMacOS ? e.metaKey : e.ctrlKey)) {
+        e.preventDefault();
+        handleAccept();
+      }
+      // Check for Cmd/Ctrl+Escape for reject or just Escape
+      else if (e.key === 'Escape') {
+        e.preventDefault();
+        handleReject();
+      }
+    };
+
+    // Add the event listener to the document
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Clean up the event listener on unmount
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleAccept, handleReject]);
+
   return (
     <div id="smtcmp-apply-view">
       <div className="view-header">
@@ -237,22 +274,37 @@ export default function ApplyViewRoot({
                 <ChevronDown size={14} />
               </button>
             </div>
-            <button
-              className="clickable-icon view-action"
-              aria-label="Accept changes"
-              onClick={handleAccept}
-            >
-              {acceptIcon && <CheckIcon size={14} />}
-              Accept
-            </button>
-            <button
-              className="clickable-icon view-action"
-              aria-label="Cancel apply"
-              onClick={handleReject}
-            >
-              {rejectIcon && <X size={14} />}
-              Cancel
-            </button>
+            
+            <div className="smtcmp-action-buttons">
+              <div className="smtcmp-accept-container">
+                <button
+                  className="clickable-icon view-action"
+                  aria-label={`Accept changes (${Platform.isMacOS ? '⌘' : 'Ctrl'}+Enter)`}
+                  onClick={handleAccept}
+                  title={`Accept changes (${Platform.isMacOS ? '⌘' : 'Ctrl'}+Enter)`}
+                >
+                  {acceptIcon && <CheckIcon size={14} />}
+                  Accept
+                </button>
+                <div className="smtcmp-shortcut-hint">
+                  {Platform.isMacOS ? '⌘' : 'Ctrl'}+Enter
+                </div>
+              </div>
+              <div className="smtcmp-accept-container">
+                <button
+                  className="clickable-icon view-action"
+                  aria-label="Cancel apply (Esc)"
+                  onClick={handleReject}
+                  title="Cancel apply (Esc)"
+                >
+                  {rejectIcon && <X size={14} />}
+                  Cancel
+                </button>
+                <div className="smtcmp-shortcut-hint">
+                  Esc
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

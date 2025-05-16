@@ -13,7 +13,6 @@ export type ApplyViewState = {
 
 export class ApplyView extends View {
   private root: Root | null = null
-
   private state: ApplyViewState | null = null
 
   constructor(leaf: WorkspaceLeaf) {
@@ -42,11 +41,39 @@ export class ApplyView extends View {
     this.root?.unmount()
   }
 
+  // Method to accept changes, used by the command
+  acceptChanges() {
+    if (this.state) {
+      this.handleAcceptAndSave();
+    }
+  }
+
+  // Method to reject changes, used by the command
+  rejectChanges() {
+    if (this.state) {
+      this.leaf.detach();
+    }
+  }
+
+  // Method to handle accepting and saving changes
+  private async handleAcceptAndSave() {
+    if (!this.state) return;
+    
+    const newContent = this.state.newContent;
+    await this.app.vault.modify(this.state.file, newContent);
+    this.leaf.detach();
+  }
+
   async render() {
     if (!this.root || !this.state) return
     this.root.render(
       <AppProvider app={this.app}>
-        <ApplyViewRoot state={this.state} close={() => this.leaf.detach()} />
+        <ApplyViewRoot 
+          state={this.state} 
+          close={() => this.leaf.detach()} 
+          acceptChanges={() => this.handleAcceptAndSave()}
+          rejectChanges={() => this.leaf.detach()}
+        />
       </AppProvider>,
     )
   }

@@ -55,6 +55,52 @@ export default class SmartComposerPlugin extends Plugin {
       },
     })
 
+    // Command to accept changes in the apply view
+    this.addCommand({
+      id: 'accept-changes',
+      name: 'Accept changes in apply view',
+      checkCallback: (checking) => {
+        // Check if an ApplyView is active
+        const applyView = this.app.workspace.getActiveViewOfType(ApplyView);
+        if (!applyView) return false;
+        
+        if (checking) return true;
+        
+        // Execute the accept changes action
+        applyView.acceptChanges();
+        return true;
+      },
+      hotkeys: [
+        {
+          modifiers: ["Mod"],
+          key: "Enter",
+        },
+      ],
+    });
+
+    // Command to reject changes in the apply view
+    this.addCommand({
+      id: 'reject-changes',
+      name: 'Reject changes in apply view',
+      checkCallback: (checking) => {
+        // Check if an ApplyView is active
+        const applyView = this.app.workspace.getActiveViewOfType(ApplyView);
+        if (!applyView) return false;
+        
+        if (checking) return true;
+        
+        // Execute the reject changes action
+        applyView.rejectChanges();
+        return true;
+      },
+      hotkeys: [
+        {
+          modifiers: [],
+          key: "Escape",
+        },
+      ],
+    });
+
     this.addCommand({
       id: 'rebuild-vault-index',
       name: 'Rebuild entire vault index',
