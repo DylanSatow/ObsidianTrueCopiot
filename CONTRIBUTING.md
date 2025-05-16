@@ -1,19 +1,19 @@
-# Contributing to Obsidian Smart Composer
+# Contributing to Obsidian True Copilot
 
-We welcome contributions to Obsidian Smart Composer! This document will guide you through the process of contributing to the project.
+We welcome contributions to Obsidian True Copilot! This document will guide you through the process of contributing to the project.
 
 ## Development Workflow
 
 1. Clone the repository to your Obsidian vault's plugins directory:
 
    ```
-   git clone https://github.com/glowingjade/obsidian-smart-composer.git /path/to/your/vault/.obsidian/plugins/obsidian-smart-composer
+   git clone https://github.com/DylanSatow/ObsidianTrueCopiot.git /path/to/your/vault/.obsidian/plugins/obsidian-true-copilot
    ```
 
 2. Navigate to the plugin directory:
 
    ```
-   cd /path/to/your/vault/.obsidian/plugins/obsidian-smart-composer
+   cd /path/to/your/vault/.obsidian/plugins/obsidian-true-copilot
    ```
 
 3. Run the following commands to install dependencies and start the development server:

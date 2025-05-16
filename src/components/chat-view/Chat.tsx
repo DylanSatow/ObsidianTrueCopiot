@@ -30,6 +30,7 @@ import {
   ChatMessage,
   ChatToolMessage,
   ChatUserMessage,
+  ChatAssistantMessage,
 } from '../../types/chat'
 import {
   MentionableBlock,
@@ -46,6 +47,7 @@ import { groupAssistantAndToolMessages } from '../../utils/chat/message-groups'
 import { PromptGenerator } from '../../utils/chat/promptGenerator'
 import { readTFileContent } from '../../utils/obsidian'
 import { ErrorModal } from '../modals/ErrorModal'
+import { parseTagContents } from '../../utils/chat/parse-tag-content'
 
 import AssistantToolMessageGroupItem from './AssistantToolMessageGroupItem'
 import ChatUserInput, { ChatUserInputRef } from './chat-input/ChatUserInput'
@@ -142,10 +144,77 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
     scrollContainerRef: chatMessagesRef,
   })
 
+  const applyMutation = useMutation({
+    mutationFn: async ({
+      blockToApply,
+      chatMessages,
+    }: {
+      blockToApply: string
+      chatMessages: ChatMessage[]
+    }) => {
+      const activeFile = app.workspace.getActiveFile()
+      if (!activeFile) {
+        throw new Error(
+          'No file is currently open to apply changes. Please open a file and try again.',
+        )
+      }
+      const activeFileContent = await readTFileContent(activeFile, app.vault)
+
+      const { providerClient, model } = getChatModelClient({
+        settings,
+        modelId: settings.applyModelId,
+      })
+
+      const updatedFileContent = await applyChangesToFile({
+        blockToApply,
+        currentFile: activeFile,
+        currentFileContent: activeFileContent,
+        chatMessages,
+        providerClient,
+        model,
+      })
+      if (!updatedFileContent) {
+        throw new Error('Failed to apply changes')
+      }
+
+      await app.workspace.getLeaf(true).setViewState({
+        type: APPLY_VIEW_TYPE,
+        active: true,
+        state: {
+          file: activeFile,
+          originalContent: activeFileContent,
+          newContent: updatedFileContent,
+        } satisfies ApplyViewState,
+      })
+    },
+    onError: (error) => {
+      if (
+        error instanceof LLMAPIKeyNotSetException ||
+        error instanceof LLMAPIKeyInvalidException ||
+        error instanceof LLMBaseUrlNotSetException
+      ) {
+        new ErrorModal(app, 'Error', error.message, error.rawError?.message, {
+          showSettingsButton: true,
+        }).open()
+      } else {
+        new Notice(error.message)
+        console.error('Failed to apply changes', error)
+      }
+    },
+  })
+
+  const handleApply = useCallback(
+    (blockToApply: string, chatMessages: ChatMessage[]) => {
+      applyMutation.mutate({ blockToApply, chatMessages })
+    },
+    [applyMutation],
+  )
+
   const { abortActiveStreams, submitChatMutation } = useChatStreamManager({
     setChatMessages,
     autoScrollToBottom,
     promptGenerator,
+    handleApply,
   })
 
   const registerChatUserInputRef = (
@@ -273,72 +342,6 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
       abortActiveStreams,
       forceScrollToBottom,
     ],
-  )
-
-  const applyMutation = useMutation({
-    mutationFn: async ({
-      blockToApply,
-      chatMessages,
-    }: {
-      blockToApply: string
-      chatMessages: ChatMessage[]
-    }) => {
-      const activeFile = app.workspace.getActiveFile()
-      if (!activeFile) {
-        throw new Error(
-          'No file is currently open to apply changes. Please open a file and try again.',
-        )
-      }
-      const activeFileContent = await readTFileContent(activeFile, app.vault)
-
-      const { providerClient, model } = getChatModelClient({
-        settings,
-        modelId: settings.applyModelId,
-      })
-
-      const updatedFileContent = await applyChangesToFile({
-        blockToApply,
-        currentFile: activeFile,
-        currentFileContent: activeFileContent,
-        chatMessages,
-        providerClient,
-        model,
-      })
-      if (!updatedFileContent) {
-        throw new Error('Failed to apply changes')
-      }
-
-      await app.workspace.getLeaf(true).setViewState({
-        type: APPLY_VIEW_TYPE,
-        active: true,
-        state: {
-          file: activeFile,
-          originalContent: activeFileContent,
-          newContent: updatedFileContent,
-        } satisfies ApplyViewState,
-      })
-    },
-    onError: (error) => {
-      if (
-        error instanceof LLMAPIKeyNotSetException ||
-        error instanceof LLMAPIKeyInvalidException ||
-        error instanceof LLMBaseUrlNotSetException
-      ) {
-        new ErrorModal(app, 'Error', error.message, error.rawError?.message, {
-          showSettingsButton: true,
-        }).open()
-      } else {
-        new Notice(error.message)
-        console.error('Failed to apply changes', error)
-      }
-    },
-  })
-
-  const handleApply = useCallback(
-    (blockToApply: string, chatMessages: ChatMessage[]) => {
-      applyMutation.mutate({ blockToApply, chatMessages })
-    },
-    [applyMutation],
   )
 
   const handleToolMessageUpdate = useCallback(
@@ -555,6 +558,51 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
       chatUserInputRefs.current.get(focusedMessageId)?.focus()
     },
   }))
+
+  const startNewChat = useCallback(
+    async (initialMessage?: string) => {
+      // Reset state for a new chat
+      submitChatMutation.reset()
+      setQueryProgress({
+        type: 'idle',
+      })
+
+      // Generate a new conversation ID
+      const nextConversationId = uuidv4()
+      setCurrentConversationId(nextConversationId)
+      setChatMessages([]) // Clear chat history
+
+      if (!initialMessage) {
+        return
+      }
+
+      // Create a new user message for the initial message
+      const userMessage: ChatUserMessage = {
+        role: 'user',
+        content: null, // We'll use promptContent instead
+        promptContent: initialMessage,
+        id: uuidv4(),
+        mentionables: [],
+      }
+      setChatMessages([userMessage])
+
+      // Submit the message
+      submitChatMutation.mutate({
+        chatMessages: [userMessage],
+        conversationId: nextConversationId,
+      })
+
+      requestAnimationFrame(() => {
+        forceScrollToBottom()
+      })
+    },
+    [
+      submitChatMutation,
+      setCurrentConversationId,
+      setChatMessages,
+      forceScrollToBottom,
+    ],
+  )
 
   return (
     <div className="smtcmp-chat-container">

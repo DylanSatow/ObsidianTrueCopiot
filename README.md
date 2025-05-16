@@ -1,22 +1,22 @@
-<h1 align="center">Smart Composer</h1>
+<h1 align="center">True Copilot</h1>
 
 <p align="center">
-  <a href="https://github.com/glowingjade/obsidian-smart-composer/wiki">Documentation</a>
+  <a href="https://github.com/DylanSatow/ObsidianTrueCopiot/wiki">Documentation</a>
   ·
-  <a href="https://github.com/glowingjade/obsidian-smart-composer/issues">Report Bug</a>
+  <a href="https://github.com/DylanSatow/ObsidianTrueCopiot/issues">Report Bug</a>
   ·
-  <a href="https://github.com/glowingjade/obsidian-smart-composer/discussions">Discussions</a>
+  <a href="https://github.com/DylanSatow/ObsidianTrueCopiot/discussions">Discussions</a>
 </p>
 
 > [!NOTE]
 > **🚀 New Feature: Model Context Protocol (MCP) is now available!**  
-> You can now connect Smart Composer to external AI tools and using the open MCP standard.
+> You can now connect True Copilot to external AI tools and using the open MCP standard.
 
 ![SC1_Title.gif](https://github.com/user-attachments/assets/a50a1f80-39ff-4eba-8090-e3d75e7be98c)
 
 Everytime we ask ChatGPT, we need to put so much context information for each query. Why spend time putting background infos that are already in your vault?
 
-**Smart Composer is an Obsidian plugin that helps you write efficiently with AI by easily referencing your vault content.** Inspired by Cursor AI and ChatGPT Canvas, this plugin unifies your note-taking and content creation process within Obsidian.
+**True Copilot is an Obsidian plugin that helps you write efficiently with AI by easily referencing your vault content.** Inspired by Cursor AI and ChatGPT Canvas, this plugin unifies your note-taking and content creation process within Obsidian.
 
 ## Features
 
@@ -47,7 +47,7 @@ Now, you can **add website links and images** as additional context for your que
 
 ![SC3_ApplyEdit.gif](https://github.com/user-attachments/assets/35ee03ff-4a61-4d08-8032-ca61fb37dcf1)
 
-Smart Composer **suggests edits to your document.** You can apply with a single click.
+True Copilot **suggests edits to your document.** You can apply with a single click.
 
 - Offers document change recommendations
 - Apply suggested changes instantly
@@ -65,7 +65,7 @@ Smart Composer **suggests edits to your document.** You can apply with a single 
 
 ![mcp_demo](https://github.com/user-attachments/assets/4c80a1af-4cbf-4aa4-90d2-457499553357)
 
-Connect Smart Composer to external MCP servers.
+Connect True Copilot to external MCP servers.
 MCP lets you use powerful third-party tools and data sources right inside your chat.
 
 ### Additional Features
@@ -91,7 +91,7 @@ MCP lets you use powerful third-party tools and data sources right inside your c
 
 > [!IMPORTANT]
 > **Installer Version Requirement**  
-> Smart Composer requires a recent version of the Obsidian installer. If you experience issues with the plugin not loading properly:
+> True Copilot requires a recent version of the Obsidian installer. If you experience issues with the plugin not loading properly:
 > 
 > 1. First, try updating Obsidian normally at `Settings > General > Check for updates`.
 > 
@@ -102,7 +102,7 @@ MCP lets you use powerful third-party tools and data sources right inside your c
 
 1. Open Obsidian Settings
 2. Navigate to "Community plugins" and click "Browse"
-3. Search for "Smart Composer" and click Install
+3. Search for "True Copilot" and click Install
 4. Enable the plugin in Community plugins
 5. Set up your API key in plugin settings
    - OpenAI : [ChatGPT API Keys](https://platform.openai.com/api-keys)
@@ -112,9 +112,9 @@ MCP lets you use powerful third-party tools and data sources right inside your c
 
 > [!TIP]
 > **Looking for a free option?**  
-> Gemini API provides the best performance among free models for Smart Composer. Recommended for users looking for a free option.
+> Gemini API provides the best performance among free models for True Copilot. Recommended for users looking for a free option.
 
-**📚 For detailed setup instructions and documentation, please visit our [Documentation](https://github.com/glowingjade/obsidian-smart-composer/wiki).**
+**📚 For detailed setup instructions and documentation, please visit our [Documentation](https://github.com/DylanSatow/ObsidianTrueCopiot/wiki).**
 
 ## Roadmap
 
@@ -129,17 +129,17 @@ Some of our planned features include:
 
 We value your input and want to ensure you can easily share your thoughts and report any issues:
 
-- **Bug Reports**: If you encounter any bugs or unexpected behavior, please submit an issue on our [GitHub Issues](https://github.com/glowingjade/obsidian-smart-composer/issues) page. Be sure to include as much detail as possible to help us reproduce and address the problem.
+- **Bug Reports**: If you encounter any bugs or unexpected behavior, please submit an issue on our [GitHub Issues](https://github.com/DylanSatow/ObsidianTrueCopiot/issues) page. Be sure to include as much detail as possible to help us reproduce and address the problem.
 
-- **Feature Requests**: For new feature ideas or enhancements, please use our [GitHub Discussions - Ideas & Feature Requests](https://github.com/glowingjade/obsidian-smart-composer/discussions/categories/ideas-feature-requests) page. Create a new discussion to share your suggestions. This allows for community engagement and helps us prioritize future developments.
+- **Feature Requests**: For new feature ideas or enhancements, please use our [GitHub Discussions - Ideas & Feature Requests](https://github.com/DylanSatow/ObsidianTrueCopiot/discussions/categories/ideas-feature-requests) page. Create a new discussion to share your suggestions. This allows for community engagement and helps us prioritize future developments.
 
-- **Show and Tell**: We love seeing how you use Smart Composer! Share your unique use cases, workflows, or interesting applications of the plugin in the [GitHub Discussions - Smart Composer Showcase](https://github.com/glowingjade/obsidian-smart-composer/discussions/categories/smart-composer-showcase) page.
+- **Show and Tell**: We love seeing how you use True Copilot! Share your unique use cases, workflows, or interesting applications of the plugin in the [GitHub Discussions - True Copilot Showcase](https://github.com/DylanSatow/ObsidianTrueCopiot/discussions/categories/smart-composer-showcase) page.
 
-Your feedback and experiences are crucial in making Smart Composer better for everyone!
+Your feedback and experiences are crucial in making True Copilot better for everyone!
 
 ## Contributing
 
-We welcome all kinds of contributions to Smart Composer, including bug reports, bug fixes, documentation improvements, and feature enhancements.
+We welcome all kinds of contributions to True Copilot, including bug reports, bug fixes, documentation improvements, and feature enhancements.
 
 **For major feature ideas, please create an issue first to discuss feasibility and implementation approach.**
 
@@ -156,13 +156,13 @@ If you're interested in contributing, please refer to our [CONTRIBUTING.md](CONT
 
 ### Core Team
 
-These contributors were instrumental in shaping the initial vision, architecture, and design of Smart Composer:
+These contributors were instrumental in shaping the initial vision, architecture, and design of True Copilot:
 
 **[@glowingjade](https://github.com/glowingjade)** ([Twitter](https://x.com/andy_suh_)), **[@kevin-on](https://github.com/kevin-on)**, **[@realsnoopso](https://github.com/realsnoopso)** ([Twitter](https://twitter.com/RealSnoopSo) · [LinkedIn](https://linkedin.com/in/realsnoopso)), **[@woosukji](https://github.com/woosukji)**
 
 ### Additional Contributors
 
-We also want to thank everyone else who has contributed. Your time and effort help make Smart Composer better for everyone!
+We also want to thank everyone else who has contributed. Your time and effort help make True Copilot better for everyone!
 
 ## License
 
@@ -170,7 +170,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Support the Project
 
-If you find Smart Composer valuable, consider supporting its development:
+If you find True Copilot valuable, consider supporting its development:
 
 <a href="https://www.buymeacoffee.com/kevin.on" target="_blank">
   <img src="https://github.com/user-attachments/assets/e794767d-b7dd-40eb-9132-e48ae7088000" alt="Buy Me A Coffee" width="180">
@@ -182,4 +182,4 @@ Your support helps maintain and improve this plugin. Every contribution is appre
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=glowingjade/obsidian-smart-composer&type=Date)](https://star-history.com/#glowingjade/obsidian-smart-composer&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=DylanSatow/ObsidianTrueCopiot&type=Date)](https://star-history.com/#DylanSatow/ObsidianTrueCopiot&Date)

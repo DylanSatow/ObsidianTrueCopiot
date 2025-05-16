@@ -20,8 +20,8 @@ export function SettingsTabRoot({ app, plugin }: SettingsTabRootProps) {
   return (
     <>
       <ObsidianSetting
-        name="Support Smart Composer"
-        desc="If you find Smart Composer valuable, consider supporting its development!"
+        name="Support True Copilot"
+        desc="If you find True Copilot valuable, consider supporting its development!"
         heading
         className="smtcmp-settings-support-smart-composer"
       >

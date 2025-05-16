@@ -4,11 +4,11 @@ export class InstallerUpdateRequiredModal extends Modal {
   constructor(app: App) {
     super(app)
 
-    this.setTitle('Smart Composer Requires Obsidian Update')
+    this.setTitle('True Copilot Requires Obsidian Update')
 
     const messageEl = this.contentEl.createDiv()
     messageEl.createSpan({
-      text: "Smart Composer requires a newer version of the Obsidian installer. Please note that this is different from Obsidian's in-app updates. You must download the latest version of Obsidian manually to continue using Smart Composer.",
+      text: "True Copilot requires a newer version of the Obsidian installer. Please note that this is different from Obsidian's in-app updates. You must download the latest version of Obsidian manually to continue using True Copilot.",
     })
     messageEl.style.marginBottom = '1rem'
 
