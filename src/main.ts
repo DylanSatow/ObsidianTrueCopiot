@@ -43,8 +43,8 @@ export default class SmartComposerPlugin extends Plugin {
     // This adds a simple command that can be triggered anywhere
     this.addCommand({
       id: 'open-new-chat',
-      name: 'Open chat',
-      callback: () => this.openChatView(true),
+      name: 'Toggle chat view',
+      callback: () => this.toggleChatView(),
     })
 
     this.addCommand({
@@ -383,5 +383,84 @@ ${validationResult.error.issues.map((v) => v.message).join('\n')}`)
     new Notice('Reloading "smart-composer" due to migration', 1000)
     leaves[0].detach()
     await this.activateChatView()
+  }
+
+  async toggleChatView() {
+    const leaves = this.app.workspace.getLeavesOfType(CHAT_VIEW_TYPE);
+    
+    // If chat view is already open
+    if (leaves.length > 0) {
+      // Check if the sidebar containing chat is collapsed
+      let isSidebarCollapsed = false;
+      
+      try {
+        // @ts-ignore - We're handling type issues at runtime
+        const rightSplit = this.app.workspace.rightSplit;
+        // @ts-ignore - We're handling type issues at runtime
+        const leftSplit = this.app.workspace.leftSplit;
+        
+        // If we have a right sidebar with leaves and it's not collapsed
+        if (rightSplit && !rightSplit.collapsed && this.isLeafInSplit(leaves[0], rightSplit)) {
+          rightSplit.collapse();
+          return;
+        }
+        
+        // If we have a left sidebar with leaves and it's not collapsed
+        if (leftSplit && !leftSplit.collapsed && this.isLeafInSplit(leaves[0], leftSplit)) {
+          leftSplit.collapse();
+          return;
+        }
+        
+        // If we get here, the sidebar is likely collapsed, so we should expand it
+        // Reveal the leaf which effectively expands the sidebar
+        this.app.workspace.revealLeaf(leaves[0]);
+        
+        // Focus the chat input after revealing the leaf
+        setTimeout(() => {
+          if (leaves[0].view instanceof ChatView) {
+            leaves[0].view.focusMessage();
+          }
+        }, 100);
+        
+        return;
+        
+      } catch (e) {
+        console.error("Error toggling sidebar:", e);
+        // Fallback to standard behavior
+        this.app.workspace.revealLeaf(leaves[0]);
+        
+        // Still try to focus the chat input
+        setTimeout(() => {
+          if (leaves[0].view instanceof ChatView) {
+            leaves[0].view.focusMessage();
+          }
+        }, 100);
+      }
+      return;
+    }
+    
+    // No chat view open, so open a new one
+    await this.openChatView(true);
+    
+    // Focus the chat input after opening
+    setTimeout(() => {
+      const leaves = this.app.workspace.getLeavesOfType(CHAT_VIEW_TYPE);
+      if (leaves.length > 0 && leaves[0].view instanceof ChatView) {
+        leaves[0].view.focusMessage();
+      }
+    }, 100);
+  }
+  
+  // Helper method to check if a leaf is in a specific split
+  private isLeafInSplit(leaf: any, split: any): boolean {
+    try {
+      // @ts-ignore - Try to find the leaf in the leaves of the split
+      return split.children.some((child: any) => 
+        child.children && child.children.some((grandchild: any) => grandchild === leaf)
+      );
+    } catch (e) {
+      // If we can't determine it, assume false
+      return false;
+    }
   }
 }
