@@ -588,8 +588,8 @@ input[type='text'].smtcmp-chat-list-dropdown-item-title-input {
   flex-direction: column;
   font-family: var(--font-interface);
 
-  --smtcmp-current-color-rgb: 185, 28, 28; /* red-700 */
-  --smtcmp-incoming-color-rgb: 4, 120, 87; /* emerald-700 */
+  --smtcmp-current-color-rgb: 244, 67, 54;  /* Nicer red */
+  --smtcmp-incoming-color-rgb: 76, 175, 80; /* Nicer green */
 
   .view-content {
     padding: 0;
@@ -662,6 +662,8 @@ input[type='text'].smtcmp-chat-list-dropdown-item-title-input {
     }
   }
   
+  /* Commented out as these styles are replaced by the bottom modal action buttons */
+  /* 
   .smtcmp-action-buttons {
     display: flex;
     align-items: center;
@@ -685,6 +687,7 @@ input[type='text'].smtcmp-chat-list-dropdown-item-title-input {
     white-space: nowrap;
     margin-top: -2px;
   }
+  */
 
   .smtcmp-diff-block {
     white-space: pre-wrap;
@@ -697,11 +700,15 @@ input[type='text'].smtcmp-chat-list-dropdown-item-title-input {
   }
 
   .smtcmp-diff-block.added {
-    background-color: rgba(var(--smtcmp-incoming-color-rgb), 0.3);
+    background-color: rgba(var(--smtcmp-incoming-color-rgb), 0.15);
+    border-left: 3px solid rgba(var(--smtcmp-incoming-color-rgb), 0.6);
+    padding-left: 8px;
   }
 
   .smtcmp-diff-block.removed {
-    background-color: rgba(var(--smtcmp-current-color-rgb), 0.3);
+    background-color: rgba(var(--smtcmp-current-color-rgb), 0.15);
+    border-left: 3px solid rgba(var(--smtcmp-current-color-rgb), 0.6);
+    padding-left: 8px;
   }
 
   .smtcmp-diff-block-container {
@@ -709,6 +716,8 @@ input[type='text'].smtcmp-chat-list-dropdown-item-title-input {
     scroll-margin-top: var(--size-4-8);
   }
 
+  /* Commented out as these styles are no longer needed after removing diff block action buttons */
+  /*
   .smtcmp-diff-block-actions {
     position: absolute;
     right: 0;
@@ -742,6 +751,7 @@ input[type='text'].smtcmp-chat-list-dropdown-item-title-input {
       background: rgba(var(--smtcmp-current-color-rgb), 1);
     }
   }
+  */
 
   .smtcmp-diff-navigation {
     display: flex;
@@ -980,28 +990,6 @@ button.smtcmp-chat-input-model-select {
   display: flex;
   align-items: center;
   justify-content: end;
-
-  /* button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 20px;
-    width: 20px;
-    padding: 0;
-    background-color: transparent;
-    border-color: transparent;
-    box-shadow: none;
-    color: var(--text-faint);
-    cursor: pointer;
-
-    &:hover {
-      background-color: var(--background-modifier-hover);
-    }
-  }
-
-  .smtcmp-assistant-message-actions-icon--copied {
-    color: var(--text-muted);
-  } */
 }
 
 .smtcmp-popover-content {
@@ -1818,4 +1806,75 @@ button.smtcmp-chat-input-model-select {
   display: flex;
   align-items: center;
   gap: var(--size-4-1);
+}
+
+/* Bottom action modal for accept/reject buttons */
+.smtcmp-bottom-action-modal {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  border-radius: var(--radius-m);
+  background-color: var(--background-secondary);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--background-modifier-border);
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.smtcmp-bottom-action-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.smtcmp-bottom-action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-s);
+  background-color: var(--background-secondary-alt);
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--background-modifier-border);
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-medium);
+  min-width: 100px;
+}
+
+.smtcmp-bottom-action-button:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.smtcmp-accept-button {
+  background-color: #4CAF50; /* Nice, vibrant green */
+  color: white;
+  border-color: #43A047;
+}
+
+.smtcmp-accept-button:hover {
+  background-color: #66BB6A; /* Lighter green on hover */
+}
+
+.smtcmp-reject-button {
+  background-color: #F44336; /* Nice, vibrant red */
+  color: white;
+  border-color: #E53935;
+}
+
+.smtcmp-reject-button:hover {
+  background-color: #EF5350; /* Lighter red on hover */
+}
+
+.smtcmp-bottom-shortcut-hint {
+  font-size: var(--font-smallest);
+  opacity: 0.8;
+  margin-left: 4px;
+  padding: 2px 4px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-s);
 }

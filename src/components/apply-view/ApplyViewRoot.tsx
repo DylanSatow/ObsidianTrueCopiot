@@ -274,37 +274,6 @@ export default function ApplyViewRoot({
                 <ChevronDown size={14} />
               </button>
             </div>
-            
-            <div className="smtcmp-action-buttons">
-              <div className="smtcmp-accept-container">
-                <button
-                  className="clickable-icon view-action"
-                  aria-label={`Accept changes (${Platform.isMacOS ? '⌘' : 'Ctrl'}+Enter)`}
-                  onClick={handleAccept}
-                  title={`Accept changes (${Platform.isMacOS ? '⌘' : 'Ctrl'}+Enter)`}
-                >
-                  {acceptIcon && <CheckIcon size={14} />}
-                  Accept
-                </button>
-                <div className="smtcmp-shortcut-hint">
-                  {Platform.isMacOS ? '⌘' : 'Ctrl'}+Enter
-                </div>
-              </div>
-              <div className="smtcmp-accept-container">
-                <button
-                  className="clickable-icon view-action"
-                  aria-label="Cancel apply (Esc)"
-                  onClick={handleReject}
-                  title="Cancel apply (Esc)"
-                >
-                  {rejectIcon && <X size={14} />}
-                  Cancel
-                </button>
-                <div className="smtcmp-shortcut-hint">
-                  Esc
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -335,6 +304,33 @@ export default function ApplyViewRoot({
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Bottom floating modal for accept/reject actions */}
+      <div className="smtcmp-bottom-action-modal">
+        <div className="smtcmp-bottom-action-buttons">
+          <button
+            className="smtcmp-bottom-action-button smtcmp-reject-button"
+            aria-label="Cancel apply (Esc)"
+            onClick={handleReject}
+            title="Cancel apply (Esc)"
+          >
+            {rejectIcon && <X size={16} />}
+            <span>Cancel</span>
+            <span className="smtcmp-bottom-shortcut-hint">Esc</span>
+          </button>
+          
+          <button
+            className="smtcmp-bottom-action-button smtcmp-accept-button"
+            aria-label={`Accept all changes (${Platform.isMacOS ? '⌘' : 'Ctrl'}+Enter)`}
+            onClick={handleAccept}
+            title={`Accept all changes (${Platform.isMacOS ? '⌘' : 'Ctrl'}+Enter)`}
+          >
+            {acceptIcon && <CheckIcon size={16} />}
+            <span>Accept All</span>
+            <span className="smtcmp-bottom-shortcut-hint">{Platform.isMacOS ? '⌘' : 'Ctrl'}+Enter</span>
+          </button>
         </div>
       </div>
     </div>
@@ -369,15 +365,6 @@ const DiffBlockView = forwardRef<
             <div style={{ width: '100%' }}>{part.modifiedValue}</div>
           </div>
         )}
-        <div className="smtcmp-diff-block-actions">
-          <button onClick={onAcceptIncoming} className="smtcmp-accept">
-            Accept Incoming
-          </button>
-          <button onClick={onAcceptCurrent} className="smtcmp-exclude">
-            Accept Current
-          </button>
-          <button onClick={onAcceptBoth}>Accept Both</button>
-        </div>
       </div>
     )
   }
